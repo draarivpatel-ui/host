@@ -39,6 +39,9 @@ describe('sandbox rating', () => {
     expect(page.status).toBe(200);
     const html = await page.text();
     expect(html).toContain('Upstash Box');
+    // The green-row class must not reuse .top, the header bar's flex class.
+    expect(html).toContain('<tr class="both"');
+    expect(html).not.toContain('<tr class="top"');
     expect(html).toContain('href="/v1/sandbox-rating"');
     const j = await (await get('/v1/sandbox-rating')).json();
     expect(j.sandboxes.length).toBe(SANDBOXES.length);
