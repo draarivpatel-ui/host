@@ -74,7 +74,7 @@ export async function handle(request, env = {}, opts = {}) {
   const origin = env.PUBLIC_ORIGIN || url.origin;
 
   // ---- public
-  if (request.method === 'GET' && path === '/') return html(hostsPage(), 200, { 'cache-control': 'public, max-age=300' });
+  if (request.method === 'GET' && path === '/') return html(hostsPage(origin), 200, { 'cache-control': 'public, max-age=300' });
   if (request.method === 'GET' && path === '/docs') return html(docsPage(origin), 200, { 'cache-control': 'public, max-age=300' });
   if (request.method === 'GET' && (path === '/rating' || path === '/rating/')) return html(ratingPage(ranked(), RATED), 200, { 'cache-control': 'public, max-age=300' });
   if (request.method === 'GET' && path === '/v1/sandbox-rating') return Response.json({ rated: RATED, sandboxes: ranked() }, { headers: { 'access-control-allow-origin': '*', 'cache-control': 'public, max-age=300' } });
