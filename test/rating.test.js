@@ -26,6 +26,10 @@ describe('sandbox rating', () => {
     expect(new Set(SANDBOXES.map((s) => s.id)).size).toBe(SANDBOXES.length);
   });
 
+  test('PaperPod and Railway are marked as in fleet (fleet#74)', () => {
+    for (const id of ['paperpod', 'railway']) expect(SANDBOXES.find((s) => s.id === id)?.inFleet).toBe(true);
+  });
+
   test('ranked is best first and Upstash Box is in the top group', () => {
     const r = ranked();
     for (let i = 1; i < r.length; i++) expect(r[i - 1].score).toBeGreaterThanOrEqual(r[i].score);
