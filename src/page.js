@@ -74,7 +74,7 @@ const RATING_CSS = `
 .rt th,.rt td{padding:9px 10px;border-bottom:1px solid var(--ink);text-align:left;vertical-align:top}
 .rt th{font:500 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.05em;background:var(--paper)}
 .rt td.n{font-family:var(--mono);text-align:right}.rt .sc{font:800 20px/1 var(--serif)}
-.rt tr.top td{background:color-mix(in srgb,var(--green) 12%,var(--card))}
+.rt tr.both td{background:color-mix(in srgb,var(--green) 12%,var(--card))}
 .y{color:var(--green);font-weight:600}.no{color:var(--red);font-weight:600}.q{color:var(--dim)}
 .rt small{display:block;color:var(--dim);font-size:12px;margin-top:3px}
 .wrap{overflow-x:auto;margin:0 -16px;padding:0 16px}
@@ -86,7 +86,7 @@ const yn = (v, yes, no) => (v === true ? `<span class="y">${yes}</span>` : v ===
 export function ratingPage(rows, rated) {
   const body = rows
     .map(
-      (s, i) => `<tr class="${s.card === false && s.link === true ? 'top' : ''}" data-card="${s.card === false ? 1 : 0}" data-link="${s.link === true ? 1 : 0}">
+      (s, i) => `<tr class="${s.card === false && s.link === true ? 'both' : ''}" data-card="${s.card === false ? 1 : 0}" data-link="${s.link === true ? 1 : 0}">
 <td class="n">${i + 1}</td><td><a href="${esc(s.url)}" rel="noopener"><b>${esc(s.name)}</b></a>${s.inFleet ? ' <span class="tag">in fleet</span>' : ''}<small>${esc(s.note || '')}</small></td>
 <td>${yn(s.card === null || s.card === undefined ? null : !s.card, 'No card', 'Card')}<small>${esc(s.credit || '')}</small></td>
 <td>${yn(s.link, 'Link', 'No link')}<small>${esc(s.linkHow || '')}</small></td>
