@@ -19,7 +19,7 @@ concurrency:
 jobs:
   build-test:
     if: github.event_name != 'schedule'
-    uses: flisk-sh/.github/.github/workflows/ci.yml@16754801a8248cfa1525152ff5fc74e4cb12babf # v1.2.0
+    uses: flisk-sh/.github/.github/workflows/ci.yml@fix/ci-bun-ruby-toolchains # test
 
   dependency-review:
     if: github.event_name == 'pull_request'
