@@ -8,6 +8,7 @@ import { clearSession, makeSession, readSession, sameOrigin } from './session.js
 import { vaultReady } from './vault.js';
 import { connectProvider, createKey, disconnectProvider, getHost, listConnections, listHosts, listKeys, loginForKey, markHostRemoved, providerKey, recordHost, revokeKey } from './store.js';
 import { overMinuteLimit } from './limit.js';
+import { withSecurityHeaders } from './security-headers.js';
 
 const LLMS = (o) => `# Host
 
@@ -195,4 +196,4 @@ export async function handle(request, env = {}, opts = {}) {
   return html(messagePage('Page not found', 'Nothing lives at this address.'), 404);
 }
 
-export default { fetch: (request, env) => handle(request, env) };
+export default { fetch: async (request, env) => withSecurityHeaders(await handle(request, env)) };
