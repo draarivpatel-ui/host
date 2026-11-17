@@ -143,14 +143,14 @@ export async function handle(request, env = {}, opts = {}) {
       m = /^\/console\/providers\/([a-z0-9]+)\/(connect|disconnect)$/.exec(path);
       if (m) {
         const [, provider, action] = m;
-        if (!providers[provider] || providers[provider].demo) return page('providers', { error: 'No such provider.' });
-        if (!canConnect) return page('providers', { error: 'Connecting providers is not set up on this copy of host.' });
+        if (!providers[provider] || providers[provider].demo) return page('hosts', { error: 'No such provider.' });
+        if (!canConnect) return page('hosts', { error: 'Connecting providers is not set up on this copy of host.' });
         if (action === 'disconnect') {
           await disconnectProvider(env, login, provider);
-          return page('providers', { notice: `${providers[provider].label} disconnected. Host no longer has that key.` });
+          return page('hosts', { notice: `${providers[provider].label} disconnected. Host no longer has that key.` });
         }
         const done = await connectProvider(env, login, provider, form?.get('key'));
-        return page('providers', done.error ? { error: done.error } : { notice: `${providers[provider].label} connected.` });
+        return page('hosts', done.error ? { error: done.error } : { notice: `${providers[provider].label} connected.` });
       }
       if (path === '/console/default') {
         const provider = String(form?.get('provider') || '');

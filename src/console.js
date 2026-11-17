@@ -6,7 +6,6 @@ import { PROVIDERS } from './providers/index.js';
 const SECTIONS = [
   ['overview', 'Overview'],
   ['hosts', 'Hosts'],
-  ['providers', 'Providers'],
   ['keys', 'API keys'],
   ['docs', 'Docs'],
 ];
@@ -38,12 +37,13 @@ function pickerHtml({ connections, defaultProvider, canConnect }) {
   const info = Object.fromEntries(HOSTS.map((h) => [h.id, h]));
   const usable = (id) => PROVIDERS[id].demo || connections[id];
   const cards = Object.entries(PROVIDERS)
+    .filter(([id]) => usable(id))
     .map(([id, p]) => {
       const h = info[id];
       const ok = usable(id);
       const catchText = h ? h.catch : 'A pretend host that needs no account. The address does not exist.';
       const state = ok ? (p.demo ? 'No account needed' : `Connected · key ending ${esc(connections[id].hint)}`) : 'Not connected';
-      return `<label class="pk${defaultProvider === id ? ' sel' : ''}${ok ? '' : ' off'}"><input type="radio" name="provider" value="${id}"${ok ? '' : ' disabled'}${defaultProvider === id ? ' checked' : ''} required><span><b>${esc(p.label)}</b>${defaultProvider === id ? ' <span class="tag use">Your default</span>' : ''}${p.untested ? ' <span class="tag unchecked" title="The provider itself is fine. Host&#39;s connector for it has not started a pod host on a real account yet.">connector not run yet</span>' : ''}<br><span class="note">${state}.${ok ? '' : canConnect ? ` <a href="/console?section=providers#${id}">Connect it</a>` : ''}</span><br><span class="note">${esc(catchText)}</span></span></label>`;
+      return `<label class="pk${defaultProvider === id ? ' sel' : ''}${ok ? '' : ' off'}"><input type="radio" name="provider" value="${id}"${ok ? '' : ' disabled'}${defaultProvider === id ? ' checked' : ''} required><span><b>${esc(p.label)}</b>${defaultProvider === id ? ' <span class="tag use">Your default</span>' : ''}${p.untested ? ' <span class="tag unchecked" title="The provider itself is fine. Host&#39;s connector for it has not started a pod host on a real account yet.">connector not run yet</span>' : ''}<br><span class="note">${state}.</span><br><span class="note">${esc(catchText)}</span></span></label>`;
     })
     .join('');
   return cards;
@@ -64,13 +64,15 @@ function hostsSection({ hosts, connections, defaultProvider, canConnect, notice,
 ${notice ? `<div class="msg">${esc(notice)}</div>` : ''}${error ? `<div class="msg err">${esc(error)}</div>` : ''}
 ${fresh ? `<div class="msg"><b>Host started.</b> In fleet, connect the provider <b>Fleet pod</b> with:<code class="cred">${esc(fresh.credential)}</code><span class="note">${fresh.provider === 'demo' ? 'This is a pretend host: the address does not exist.' : 'Keep it private: the part before @ is the host&#39;s password.'}</span></div>` : ''}
 ${form}
+${connectSection({ connections, canConnect })}
 <h2>Your hosts</h2>${live.length ? `<table><thead><tr><th>Id</th><th>Provider</th><th>Address</th><th>Started</th><th></th></tr></thead><tbody>${rows}</tbody></table>` : '<p class="note">None yet. Start the Demo host to see the flow with no account.</p>'}`;
 }
 
-function providersSection({ connections, notice, error, canConnect }) {
+function connectSection({ connections, canConnect }) {
   const cards = HOSTS.map((h) => {
     const a = PROVIDERS[h.id];
     const conn = connections[h.id];
+    if (conn) return `<div class="pc" id="${h.id}"><h3>${esc(h.name)}</h3><div class="row"><span class="note">Connected · key ending ${esc(conn.hint)}. Choose it above.</span><form method="post" action="/console/providers/${h.id}/disconnect"><button class="btn o" type="submit">Disconnect</button></form></div></div>`;
     const connect = !a
       ? '<p class="note">No connector yet. <a href="https://github.com/flisk-sh/host/issues">Ask for one</a>.</p>'
       : conn
@@ -80,7 +82,7 @@ function providersSection({ connections, notice, error, canConnect }) {
           : '<p class="note">Connecting is not set up on this copy.</p>';
     return `<div class="pc" id="${h.id}"><h3>${esc(h.name)} <span class="tag ${esc(h.status)}">${esc(LABEL[h.status])}</span></h3><p class="note">${esc(h.catch)}</p>${a?.untested ? '<p class="note"><b>Not run on a real account yet.</b> Built from the provider&#39;s public docs.</p>' : ''}${connect}</div>`;
   }).join('');
-  return `<h1>Providers</h1><p class="note">Connect your own account at each hosting provider with an API key. Host keeps it encrypted and never sends it anywhere except that provider. One host key then starts hosts on any of them.</p>${notice ? `<div class="msg">${esc(notice)}</div>` : ''}${error ? `<div class="msg err">${esc(error)}</div>` : ''}<div class="cards">${cards}</div>`;
+  return `<h2 id="connect">Connect a provider</h2><p class="note">Connect your own account at a hosting provider with an API key. Host keeps it encrypted and never sends it anywhere except that provider. Once connected, it appears in the list above.</p><div class="cards">${cards}</div>`;
 }
 
 function keysSection({ keys, newKey, error }) {
@@ -103,13 +105,13 @@ GET    ${esc(origin)}/v1/providers</pre>
 function overviewSection({ hosts, keys, connections }) {
   const live = hosts.filter((h) => !h.removed).length;
   return `<h1>Overview</h1><div class="stats"><div><b>${live}</b>hosts running</div><div><b>${Object.keys(connections).length}</b>providers connected</div><div><b>${keys.length}</b>API keys</div></div>
-<h2>How it works</h2><ol><li>Connect a hosting provider on <a href="/console?section=providers">Providers</a> with your own key. Every free host we found needs a card or has a catch, so read each card first.</li><li>Start a host on <a href="/console?section=hosts">Hosts</a>, or with one API call.</li><li>Paste the <code>token@address</code> into fleet's <b>Fleet pod</b> provider. Fleet then starts pods there, for free, for trusted code.</li></ol>
+<h2>How it works</h2><ol><li>Connect a hosting provider on <a href="/console?section=hosts#connect">Hosts</a> with your own key. Every free host we found needs a card or has a catch, so read each card first.</li><li>Start a host on <a href="/console?section=hosts">Hosts</a>, or with one API call.</li><li>Paste the <code>token@address</code> into fleet's <b>Fleet pod</b> provider. Fleet then starts pods there, for free, for trusted code.</li></ol>
 <p class="note">No money moves through Flisk: you pay each provider directly on your own account.</p>`;
 }
 
 export function cabinetPage({ origin, login, section = 'overview', hosts = [], keys = [], connections = {}, defaultProvider = null, canConnect = false, notice, error, newKey, fresh }) {
-  const sec = SECTIONS.some(([id]) => id === section) ? section : 'overview';
-  const body = { overview: overviewSection, hosts: hostsSection, providers: providersSection, keys: keysSection, docs: () => docsSection(origin) }[sec]({ hosts, keys, connections, defaultProvider, canConnect, notice, error, newKey, fresh });
+  const sec = section === 'providers' ? 'hosts' : SECTIONS.some(([id]) => id === section) ? section : 'overview';
+  const body = { overview: overviewSection, hosts: hostsSection, keys: keysSection, docs: () => docsSection(origin) }[sec]({ hosts, keys, connections, defaultProvider, canConnect, notice, error, newKey, fresh });
   const nav = SECTIONS.map(([id, label]) => `<a href="/console?section=${id}"${id === sec ? ' class="on" aria-current="page"' : ''}>${label}</a>`).join('');
   return shell({
     title: `${SECTIONS.find(([id]) => id === sec)[1]} · host`,
