@@ -112,4 +112,28 @@ describe('cabinet reloads', () => {
     await expect(nf.create('k', { name: 'h2', token: 't' }, { fetchImpl: (u, i) => (calls.push(i.method || 'GET'), bad(u, i)) })).rejects.toThrow('no public address');
     expect(calls.at(-1)).toBe('DELETE');
   });
+
+  test('provider picker: lists providers with their catch, saves a default, start uses it', async () => {
+    const env = mkEnv();
+    const c = await signIn(env);
+    let h = await (await get(env, c, '/console?section=hosts')).text();
+    expect(h).toContain('not chosen yet');
+    expect(h).toMatch(/name="provider" value="render" disabled/);
+    expect(h).toContain('connector not run yet');
+    expect(h).not.toMatch(/>untested</);
+    expect(h).toMatch(/name="provider" value="demo"(?! disabled)/);
+    // a provider that is not connected cannot become the default
+    expect(await (await post(env, c, '/console/default', { provider: 'render' })).text()).toContain('Connect that provider first');
+    // demo can; the choice is remembered and shown
+    expect(await (await post(env, c, '/console/default', { provider: 'demo' })).text()).toContain('is now your default');
+    h = await (await get(env, c, '/console?section=hosts')).text();
+    expect(h).toMatch(/Your pods run on: <b id="host-now">Demo/);
+    expect(h).toMatch(/value="demo" checked/);
+    // "make this my default" on Start
+    const env2 = mkEnv();
+    const c2 = await signIn(env2);
+    const started = await post(env2, c2, '/console/hosts', { provider: 'demo', remember: '1' });
+    expect(await started.text()).toContain('Host started');
+    expect(await (await get(env2, c2, '/console?section=hosts')).text()).toContain('id="host-now">Demo');
+  });
 });

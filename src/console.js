@@ -26,24 +26,41 @@ table{border-collapse:collapse;width:100%;font-size:14px}th,td{text-align:left;p
 td code,.cred{font:13px var(--mono);word-break:break-all}.cred{display:block;background:#0a0a0e;color:#e8e8e0;padding:10px 12px;margin:6px 0}
 .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:0;border:1px solid var(--ink)}.pc{padding:14px;border:0;border-right:1px solid var(--ink);border-bottom:1px solid var(--ink);background:var(--card)}
 .pc h3{margin:0 0 6px;font-size:17px}.pc .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.pc form{margin:0}
+.picker{display:grid;gap:0;border:1px solid var(--ink)}.pk{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-bottom:1px solid var(--ink);background:var(--card);cursor:pointer}.pk:last-child{border-bottom:0}.pk.sel{outline:2px solid var(--green);outline-offset:-2px}.pk.off{opacity:.7;cursor:default}.pk input{margin-top:4px}.pk span{min-width:0}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--ink);margin:16px 0}.stats div{padding:14px;border-right:1px solid var(--ink)}.stats div:last-child{border:0}.stats b{display:block;font:800 30px var(--serif)}
 @media (max-width:760px){.cab{grid-template-columns:1fr}.cab aside{flex-direction:row;flex-wrap:wrap;border-right:0;border-bottom:1px solid var(--ink);padding:0}.cab aside a{padding:12px 14px}.cab aside form{display:none}.cab main{padding:18px 16px 40px}.stats{grid-template-columns:1fr}.stats div{border-right:0;border-bottom:1px solid var(--ink)}}
 `;
 
 const when = (iso) => (iso ? new Date(iso).toISOString().slice(0, 16).replace('T', ' ') : '');
 
-function hostsSection({ hosts, connections, notice, error, fresh }) {
-  const usable = Object.entries(PROVIDERS).filter(([id, p]) => p.demo || connections[id]);
+// The provider picker: every provider as a choice with its catch, the default marked, not-connected ones pointing to Connect.
+function pickerHtml({ connections, defaultProvider, canConnect }) {
+  const info = Object.fromEntries(HOSTS.map((h) => [h.id, h]));
+  const usable = (id) => PROVIDERS[id].demo || connections[id];
+  const cards = Object.entries(PROVIDERS)
+    .map(([id, p]) => {
+      const h = info[id];
+      const ok = usable(id);
+      const catchText = h ? h.catch : 'A pretend host that needs no account. The address does not exist.';
+      const state = ok ? (p.demo ? 'No account needed' : `Connected · key ending ${esc(connections[id].hint)}`) : 'Not connected';
+      return `<label class="pk${defaultProvider === id ? ' sel' : ''}${ok ? '' : ' off'}"><input type="radio" name="provider" value="${id}"${ok ? '' : ' disabled'}${defaultProvider === id ? ' checked' : ''} required><span><b>${esc(p.label)}</b>${defaultProvider === id ? ' <span class="tag use">Your default</span>' : ''}${p.untested ? ' <span class="tag unchecked" title="The provider itself is fine. Host&#39;s connector for it has not started a pod host on a real account yet.">connector not run yet</span>' : ''}<br><span class="note">${state}.${ok ? '' : canConnect ? ` <a href="/console?section=providers#${id}">Connect it</a>` : ''}</span><br><span class="note">${esc(catchText)}</span></span></label>`;
+    })
+    .join('');
+  return cards;
+}
+
+function hostsSection({ hosts, connections, defaultProvider, canConnect, notice, error, fresh }) {
   const live = hosts.filter((h) => !h.removed);
-  const form = `<form method="post" action="/console/hosts" class="row" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><select name="provider" aria-label="Provider">${usable
-    .map(([id, p]) => `<option value="${id}">${esc(p.label)}${p.untested ? ' (untested)' : ''}</option>`)
-    .join('')}</select><button class="btn g" type="submit">Start a pod host</button></form>`;
+  const defLabel = defaultProvider && PROVIDERS[defaultProvider] ? PROVIDERS[defaultProvider].label : null;
+  const form = `<form method="post" action="/console/hosts" id="picker"><div class="picker" role="radiogroup" aria-label="Hosting provider">${pickerHtml({ connections, defaultProvider, canConnect })}</div>
+<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px"><button class="btn g" type="submit">Start a pod host</button><label class="note"><input type="checkbox" name="remember" value="1"> Make this my default</label><button class="btn o" type="submit" formaction="/console/default">Only set as default</button></div></form>`;
   const rows = live
     .map(
       (h) => `<tr><td><code>${esc(h.id)}</code></td><td>${esc(h.provider)}</td><td><code>${esc(h.url)}</code></td><td>${esc(when(h.created))}</td><td><form method="post" action="/console/hosts/${encodeURIComponent(h.id)}/stop"><button class="btn o" type="submit">Stop</button></form></td></tr>`,
     )
     .join('');
-  return `<h1>Hosts</h1><p class="note">A host is a small server (<code>fleetd</code>) that runs your agents' pods. Start one on a hosting provider you connected, then paste its address into fleet.</p>
+  return `<h1>Hosts</h1><p class="note">A host is a small server (<code>fleetd</code>) that runs your agents' pods. Pick where it runs, then paste its address into fleet.</p>
+<p>Your pods run on: <b id="host-now">${defLabel ? esc(defLabel) : 'not chosen yet'}</b></p>
 ${notice ? `<div class="msg">${esc(notice)}</div>` : ''}${error ? `<div class="msg err">${esc(error)}</div>` : ''}
 ${fresh ? `<div class="msg"><b>Host started.</b> In fleet, connect the provider <b>Fleet pod</b> with:<code class="cred">${esc(fresh.credential)}</code><span class="note">${fresh.provider === 'demo' ? 'This is a pretend host: the address does not exist.' : 'Keep it private: the part before @ is the host&#39;s password.'}</span></div>` : ''}
 ${form}
@@ -90,9 +107,9 @@ function overviewSection({ hosts, keys, connections }) {
 <p class="note">No money moves through Flisk: you pay each provider directly on your own account.</p>`;
 }
 
-export function cabinetPage({ origin, login, section = 'overview', hosts = [], keys = [], connections = {}, canConnect = false, notice, error, newKey, fresh }) {
+export function cabinetPage({ origin, login, section = 'overview', hosts = [], keys = [], connections = {}, defaultProvider = null, canConnect = false, notice, error, newKey, fresh }) {
   const sec = SECTIONS.some(([id]) => id === section) ? section : 'overview';
-  const body = { overview: overviewSection, hosts: hostsSection, providers: providersSection, keys: keysSection, docs: () => docsSection(origin) }[sec]({ hosts, keys, connections, canConnect, notice, error, newKey, fresh });
+  const body = { overview: overviewSection, hosts: hostsSection, providers: providersSection, keys: keysSection, docs: () => docsSection(origin) }[sec]({ hosts, keys, connections, defaultProvider, canConnect, notice, error, newKey, fresh });
   const nav = SECTIONS.map(([id, label]) => `<a href="/console?section=${id}"${id === sec ? ' class="on" aria-current="page"' : ''}>${label}</a>`).join('');
   return shell({
     title: `${SECTIONS.find(([id]) => id === sec)[1]} · host`,
