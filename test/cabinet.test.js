@@ -174,8 +174,10 @@ describe('cabinet reloads', () => {
     const c = await signIn(env);
     let h = await (await get(env, c, '/console?section=hosts')).text();
     expect(h).toContain('not chosen yet');
-    expect(h).toMatch(/name="provider" value="render" disabled/);
-    expect(h).toContain('connector not run yet');
+    // one list: an unconnected provider is not a radio choice; it is under Connect a provider
+    expect(h).not.toMatch(/name="provider" value="render"/);
+    expect(h).toContain('action="/console/providers/render/connect"');
+    expect(h).not.toContain('section=providers');
     expect(h).not.toMatch(/>untested</);
     expect(h).toMatch(/name="provider" value="demo"(?! disabled)/);
     // a provider that is not connected cannot become the default
