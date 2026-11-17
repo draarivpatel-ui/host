@@ -7,7 +7,6 @@ const SECTIONS = [
   ['overview', 'Overview'],
   ['hosts', 'Hosts'],
   ['providers', 'Providers'],
-  ['model', 'Model'],
   ['keys', 'API keys'],
   ['docs', 'Docs'],
 ];
@@ -74,17 +73,6 @@ ${newKey ? `<div class="msg"><b>Copy it now, it is shown once.</b><code class="c
 <h2>Your keys</h2>${keys.length ? `<table><thead><tr><th>Name</th><th>Key</th><th>Created</th><th></th></tr></thead><tbody>${keys.map((k) => `<tr><td>${esc(k.name)}</td><td><code>${esc(k.hint)}</code></td><td>${esc(when(k.created))}</td><td><form method="post" action="/console/keys/${esc(k.id)}/revoke"><button class="btn o" type="submit">Revoke</button></form></td></tr>`).join('')}</tbody></table>` : '<p class="note">No keys yet.</p>'}`;
 }
 
-// The model your pods use. The picker is inference's own page in an iframe: the key is sealed there, host never sees or stores it.
-export const PICKER_SRC = 'https://inference.flisk.si/picker.js';
-function modelSection() {
-  return `<h1>Model</h1><p class="note">Pick the AI model your pods use: OpenAI, Claude or OpenRouter with your own key, or leave it on the free Flisk Wolf. The key is saved by Flisk Inference, not by host. Calls made with your Flisk API key then run on this choice.</p>
-<p>Current choice: <b id="model-now">checking…</b></p><div id="model-picker"></div>
-<noscript><p class="note">The picker needs JavaScript. Or set it at <a href="https://inference.flisk.si">inference.flisk.si</a>.</p></noscript>
-<script src="${PICKER_SRC}"></script>
-<script>(function(){var now=document.getElementById('model-now');function show(c){now.textContent=c?c.provider+' · '+c.model:'Free Flisk Wolf'}
-if(window.FliskPicker)FliskPicker.mount('#model-picker',{onChange:show});else now.textContent='the picker did not load, try inference.flisk.si'})();</script>`;
-}
-
 function docsSection(origin) {
   return `<h1>Docs</h1><p class="note">Every call needs <code>Authorization: Bearer host_...</code>.</p>
 <h2>Start a host</h2><pre>curl -X POST ${esc(origin)}/v1/hosts -H "Authorization: Bearer host_..." -H "content-type: application/json" -d '{"provider":"demo"}'</pre><p class="note">Answers 201 with <code>id</code>, <code>url</code>, <code>token</code> and <code>credential</code> (<code>token@url</code>): paste that into fleet's Fleet pod provider.</p>
@@ -104,7 +92,7 @@ function overviewSection({ hosts, keys, connections }) {
 
 export function cabinetPage({ origin, login, section = 'overview', hosts = [], keys = [], connections = {}, canConnect = false, notice, error, newKey, fresh }) {
   const sec = SECTIONS.some(([id]) => id === section) ? section : 'overview';
-  const body = { overview: overviewSection, hosts: hostsSection, providers: providersSection, model: modelSection, keys: keysSection, docs: () => docsSection(origin) }[sec]({ hosts, keys, connections, canConnect, notice, error, newKey, fresh });
+  const body = { overview: overviewSection, hosts: hostsSection, providers: providersSection, keys: keysSection, docs: () => docsSection(origin) }[sec]({ hosts, keys, connections, canConnect, notice, error, newKey, fresh });
   const nav = SECTIONS.map(([id, label]) => `<a href="/console?section=${id}"${id === sec ? ' class="on" aria-current="page"' : ''}>${label}</a>`).join('');
   return shell({
     title: `${SECTIONS.find(([id]) => id === sec)[1]} · host`,

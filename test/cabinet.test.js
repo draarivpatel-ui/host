@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test';
 import { readFileSync } from 'node:fs';
-import worker, { handle } from '../src/index.js';
+import { handle } from '../src/index.js';
 import { fakeD1 } from './d1.js';
 
 const schema = readFileSync(new URL('../schema.sql', import.meta.url), 'utf8');
@@ -27,7 +27,7 @@ describe('cabinet', () => {
   test('signed in: pages render, key shown once, API works with it', async () => {
     const env = mkEnv();
     const c = await signIn(env);
-    for (const s of ['overview', 'hosts', 'providers', 'model', 'keys', 'docs']) {
+    for (const s of ['overview', 'hosts', 'providers', 'keys', 'docs']) {
       const r = await get(env, c, `/console?section=${s}`);
       expect(r.status).toBe(200);
     }
@@ -111,19 +111,5 @@ describe('cabinet reloads', () => {
     const calls = [];
     await expect(nf.create('k', { name: 'h2', token: 't' }, { fetchImpl: (u, i) => (calls.push(i.method || 'GET'), bad(u, i)) })).rejects.toThrow('no public address');
     expect(calls.at(-1)).toBe('DELETE');
-  });
-
-  test('model page mounts the inference picker, stores no key, and its CSP lets it frame', async () => {
-    const env = mkEnv();
-    const c = await signIn(env);
-    const r = await get(env, c, '/console?section=model');
-    expect(r.status).toBe(200);
-    const html = await r.text();
-    expect(html).toContain('https://inference.flisk.si/picker.js');
-    expect(html).toContain("FliskPicker.mount('#model-picker'");
-    expect(html).not.toMatch(/type="password"/);
-    const csp = (await worker.fetch(new Request(`${O}/console?section=model`, { headers: { cookie: c } }), env)).headers.get('content-security-policy');
-    expect(csp).toMatch(/script-src[^;]*https:/);
-    expect(csp).toMatch(/frame-src[^;]*https:/);
   });
 });
