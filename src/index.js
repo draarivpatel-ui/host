@@ -129,6 +129,8 @@ export async function handle(request, env = {}, opts = {}) {
     // A result page (after Start, Connect, Create key) sits at /console/<section>; a reload must not 404.
     const where = request.method === 'GET' && /^\/console\/(overview|hosts|providers|keys|docs)$/.exec(path);
     if (where) return redirect(`/console?section=${where[1]}`);
+    // Same for the result page of Stop, which sits at /console/hosts/<id>/stop.
+    if (request.method === 'GET' && /^\/console\/hosts\/[^/]+\/stop$/.test(path)) return redirect('/console?section=hosts');
     if (request.method === 'POST') {
       if (!sameOrigin(request, origin)) return html(messagePage('Not allowed', 'This form only works from host itself.'), 403);
       const form = await request.formData().catch(() => null);

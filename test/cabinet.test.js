@@ -56,6 +56,14 @@ describe('cabinet', () => {
     expect((await (await handle(new Request(`${O}/v1/hosts/${encodeURIComponent(h.id)}`, { headers: auth }), env)).json()).removed).toBeTruthy();
   });
 
+  test('reloading the Stop result page goes back to the hosts list, not a 404', async () => {
+    const env = mkEnv();
+    const c = await signIn(env);
+    const r = await get(env, c, '/console/hosts/host_demo_demo1ae4e1/stop');
+    expect(r.status).toBe(303);
+    expect(r.headers.get('location')).toBe('/console?section=hosts');
+  });
+
   test('provider key is vaulted, never shown, and used by the adapter', async () => {
     const env = mkEnv();
     const c = await signIn(env);
