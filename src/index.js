@@ -160,7 +160,7 @@ export async function handle(request, env = {}, opts = {}) {
       if (path === '/console/hosts') {
         const provider = String(form?.get('provider') || '');
         const made = await startHost(env, login, provider, { fetchImpl, providers });
-        if (!made.error && form?.get('remember')) await setDefaultProvider(env, login, provider);
+        if (!made.error) await setDefaultProvider(env, login, provider);
         return page('hosts', made.error ? { error: made.error } : { fresh: made.host });
       }
       m = /^\/console\/hosts\/([^/]+)\/stop$/.exec(path);
