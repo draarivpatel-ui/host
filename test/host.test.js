@@ -18,8 +18,8 @@ async function headValues(url = 'https://host.flisk.si/', env = {}) {
 describe('host.flisk.si', () => {
   test.each([
     ['canonical', 'https://host.flisk.si/'],
-    ['og:title', 'host: free places to run your own pods'],
-    ['og:description', 'Where to run a fleetd pod host for free, with the catch for each: Hugging Face Spaces, Oracle Always Free, Render, Koyeb, Fly and Cloudflare.'],
+    ['og:title', 'Host: free places to run your AI agent'],
+    ['og:description', 'Your AI agent needs a computer that stays on. A list of free ones, with the catch for each: Hugging Face Spaces, Oracle Always Free, Render, Koyeb, Fly and Cloudflare.'],
     ['og:image', 'https://raw.githubusercontent.com/flisk-sh/flisk-emoji/main/apps/png/host-512.png'],
     ['og:url', 'https://host.flisk.si/'],
     ['og:type', 'website'],
