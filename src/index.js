@@ -31,7 +31,7 @@ export async function startHost(env, login, provider, { fetchImpl = fetch, provi
   const adapter = providers[provider];
   if (!adapter) return { status: 400, error: `unknown provider "${provider}". Known: ${Object.keys(providers).join(', ')}` };
   const key = adapter.demo ? 'demo' : await providerKey(env, login, provider);
-  if (!key) return { status: 400, error: `connect ${adapter.label} on the Providers page first` };
+  if (!key) return { status: 400, error: `connect ${adapter.label} on the Hosts page first` };
   const token = newToken();
   const name = `fleetd-${newToken().slice(0, 8)}`;
   let made;
@@ -125,10 +125,12 @@ export async function handle(request, env = {}, opts = {}) {
     const canConnect = vaultReady(env);
     const page = async (section, extra = {}) =>
       html(cabinetPage({ origin, login, section, canConnect, hosts: await listHosts(env, login), keys: await listKeys(env, login), connections: await listConnections(env, login), ...extra }), 200, { 'cache-control': 'no-store' });
-    if (request.method === 'GET' && path === '/console') return page(url.searchParams.get('section') || 'overview');
+    if (request.method === 'GET' && path === '/console') return page(url.searchParams.get('section') === 'providers' ? 'hosts' : url.searchParams.get('section') || 'overview');
     // A result page (after Start, Connect, Create key) sits at /console/<section>; a reload must not 404.
     const where = request.method === 'GET' && /^\/console\/(overview|hosts|providers|keys|docs)$/.exec(path);
-    if (where) return redirect(`/console?section=${where[1]}`);
+    if (where) return redirect(`/console?section=${where[1] === 'providers' ? 'hosts' : where[1]}`);
+    // Same for the result page of Stop, which sits at /console/hosts/<id>/stop.
+    if (request.method === 'GET' && /^\/console\/hosts\/[^/]+\/stop$/.test(path)) return redirect('/console?section=hosts');
     if (request.method === 'POST') {
       if (!sameOrigin(request, origin)) return html(messagePage('Not allowed', 'This form only works from host itself.'), 403);
       const form = await request.formData().catch(() => null);
@@ -141,14 +143,14 @@ export async function handle(request, env = {}, opts = {}) {
       m = /^\/console\/providers\/([a-z0-9]+)\/(connect|disconnect)$/.exec(path);
       if (m) {
         const [, provider, action] = m;
-        if (!providers[provider] || providers[provider].demo) return page('providers', { error: 'No such provider.' });
-        if (!canConnect) return page('providers', { error: 'Connecting providers is not set up on this copy of host.' });
+        if (!providers[provider] || providers[provider].demo) return page('hosts', { error: 'No such provider.' });
+        if (!canConnect) return page('hosts', { error: 'Connecting providers is not set up on this copy of host.' });
         if (action === 'disconnect') {
           await disconnectProvider(env, login, provider);
-          return page('providers', { notice: `${providers[provider].label} disconnected. Host no longer has that key.` });
+          return page('hosts', { notice: `${providers[provider].label} disconnected. Host no longer has that key.` });
         }
         const done = await connectProvider(env, login, provider, form?.get('key'));
-        return page('providers', done.error ? { error: done.error } : { notice: `${providers[provider].label} connected.` });
+        return page('hosts', done.error ? { error: done.error } : { notice: `${providers[provider].label} connected.` });
       }
       if (path === '/console/hosts') {
         const made = await startHost(env, login, String(form?.get('provider') || ''), { fetchImpl, providers });

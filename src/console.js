@@ -6,7 +6,6 @@ import { PROVIDERS } from './providers/index.js';
 const SECTIONS = [
   ['overview', 'Overview'],
   ['hosts', 'Hosts'],
-  ['providers', 'Providers'],
   ['keys', 'API keys'],
   ['docs', 'Docs'],
 ];
@@ -32,7 +31,7 @@ td code,.cred{font:13px var(--mono);word-break:break-all}.cred{display:block;bac
 
 const when = (iso) => (iso ? new Date(iso).toISOString().slice(0, 16).replace('T', ' ') : '');
 
-function hostsSection({ hosts, connections, notice, error, fresh }) {
+function hostsSection({ hosts, connections, canConnect, notice, error, fresh }) {
   const usable = Object.entries(PROVIDERS).filter(([id, p]) => p.demo || connections[id]);
   const live = hosts.filter((h) => !h.removed);
   const form = `<form method="post" action="/console/hosts" class="row" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><select name="provider" aria-label="Provider">${usable
@@ -43,15 +42,16 @@ function hostsSection({ hosts, connections, notice, error, fresh }) {
       (h) => `<tr><td><code>${esc(h.id)}</code></td><td>${esc(h.provider)}</td><td><code>${esc(h.url)}</code></td><td>${esc(when(h.created))}</td><td><form method="post" action="/console/hosts/${encodeURIComponent(h.id)}/stop"><button class="btn o" type="submit">Stop</button></form></td></tr>`,
     )
     .join('');
-  return `<h1>Hosts</h1><p class="note">A host is a small server (<code>fleetd</code>) that runs your agents' pods. Start one on a hosting provider you connected, then paste its address into fleet.</p>
+  return `<h1>Hosts</h1><p class="note">A host is a small server (<code>fleetd</code>) that runs your agents' pods. Pick where it runs, then paste its address into fleet.</p>
 ${notice ? `<div class="msg">${esc(notice)}</div>` : ''}${error ? `<div class="msg err">${esc(error)}</div>` : ''}
 ${fresh ? `<div class="msg"><b>Host started.</b> In fleet, connect the provider <b>Fleet pod</b> with:<code class="cred">${esc(fresh.credential)}</code><span class="note">${fresh.provider === 'demo' ? 'This is a pretend host: the address does not exist.' : 'Keep it private: the part before @ is the host&#39;s password.'}</span></div>` : ''}
 ${form}
+<h2>Where it can run</h2><p class="note">Connect your own account at a provider with an API key. Host keeps it encrypted and never sends it anywhere except that provider.</p><div class="cards">${providerCards(connections, canConnect)}</div>
 <h2>Your hosts</h2>${live.length ? `<table><thead><tr><th>Id</th><th>Provider</th><th>Address</th><th>Started</th><th></th></tr></thead><tbody>${rows}</tbody></table>` : '<p class="note">None yet. Start the Demo host to see the flow with no account.</p>'}`;
 }
 
-function providersSection({ connections, notice, error, canConnect }) {
-  const cards = HOSTS.map((h) => {
+function providerCards(connections, canConnect) {
+  return HOSTS.map((h) => {
     const a = PROVIDERS[h.id];
     const conn = connections[h.id];
     const connect = !a
@@ -63,7 +63,6 @@ function providersSection({ connections, notice, error, canConnect }) {
           : '<p class="note">Connecting is not set up on this copy.</p>';
     return `<div class="pc" id="${h.id}"><h3>${esc(h.name)} <span class="tag ${esc(h.status)}">${esc(LABEL[h.status])}</span></h3><p class="note">${esc(h.catch)}</p>${a?.untested ? '<p class="note"><b>Not run on a real account yet.</b> Built from the provider&#39;s public docs.</p>' : ''}${connect}</div>`;
   }).join('');
-  return `<h1>Providers</h1><p class="note">Connect your own account at each hosting provider with an API key. Host keeps it encrypted and never sends it anywhere except that provider. One host key then starts hosts on any of them.</p>${notice ? `<div class="msg">${esc(notice)}</div>` : ''}${error ? `<div class="msg err">${esc(error)}</div>` : ''}<div class="cards">${cards}</div>`;
 }
 
 function keysSection({ keys, newKey, error }) {
@@ -80,19 +79,19 @@ function docsSection(origin) {
 GET    ${esc(origin)}/v1/hosts/:id
 DELETE ${esc(origin)}/v1/hosts/:id
 GET    ${esc(origin)}/v1/providers</pre>
-<p class="note">Providers are the ones you connected on the Providers page, plus <code>demo</code>. Host stops a host at its provider on DELETE.</p>`;
+<p class="note">Providers are the ones you connected on the Hosts page, plus <code>demo</code>. Host stops a host at its provider on DELETE.</p>`;
 }
 
 function overviewSection({ hosts, keys, connections }) {
   const live = hosts.filter((h) => !h.removed).length;
   return `<h1>Overview</h1><div class="stats"><div><b>${live}</b>hosts running</div><div><b>${Object.keys(connections).length}</b>providers connected</div><div><b>${keys.length}</b>API keys</div></div>
-<h2>How it works</h2><ol><li>Connect a hosting provider on <a href="/console?section=providers">Providers</a> with your own key. Every free host we found needs a card or has a catch, so read each card first.</li><li>Start a host on <a href="/console?section=hosts">Hosts</a>, or with one API call.</li><li>Paste the <code>token@address</code> into fleet's <b>Fleet pod</b> provider. Fleet then starts pods there, for free, for trusted code.</li></ol>
+<h2>How it works</h2><ol><li>On <a href="/console?section=hosts">Hosts</a>, connect a provider with your own key. Every free host we found needs a card or has a catch, so read each card first.</li><li>Start a host there, or with one API call.</li><li>Paste the <code>token@address</code> into fleet's <b>Fleet pod</b> provider. Fleet then starts pods there, for free, for trusted code.</li></ol>
 <p class="note">No money moves through Flisk: you pay each provider directly on your own account.</p>`;
 }
 
 export function cabinetPage({ origin, login, section = 'overview', hosts = [], keys = [], connections = {}, canConnect = false, notice, error, newKey, fresh }) {
   const sec = SECTIONS.some(([id]) => id === section) ? section : 'overview';
-  const body = { overview: overviewSection, hosts: hostsSection, providers: providersSection, keys: keysSection, docs: () => docsSection(origin) }[sec]({ hosts, keys, connections, canConnect, notice, error, newKey, fresh });
+  const body = { overview: overviewSection, hosts: hostsSection, keys: keysSection, docs: () => docsSection(origin) }[sec]({ hosts, keys, connections, canConnect, notice, error, newKey, fresh });
   const nav = SECTIONS.map(([id, label]) => `<a href="/console?section=${id}"${id === sec ? ' class="on" aria-current="page"' : ''}>${label}</a>`).join('');
   return shell({
     title: `${SECTIONS.find(([id]) => id === sec)[1]} · host`,
