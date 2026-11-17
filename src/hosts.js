@@ -31,7 +31,7 @@ export const HOSTS = [
     size: '4 containers, 0.25 vCPU, 512 MB, 100 hours a month',
     card: false,
     why: 'Says no card; runs a Docker image.',
-    catch: 'Sleeps after 15 minutes without traffic and a script cannot wake it. Only an MCP connector is documented, no plain API, so no connector here yet. Vendor claims, not tried.',
+    catch: 'Sleeps after 15 minutes without traffic and a script cannot wake it. Its public API makes a container from an image, but an API key cannot delete one (do that in the dashboard). Connector written from the docs, not tried.',
     url: 'https://snapdeploy.dev/docker-hosting',
   },
   {
@@ -51,7 +51,7 @@ export const HOSTS = [
     size: 'small trial credit',
     card: false,
     why: 'Deploys a Docker image and has an API.',
-    catch: 'Reports disagree: a one-time $5 credit for 30 days, then about $1 a month. It runs out, so it is a trial, not free. Not tried, no connector yet.',
+    catch: 'Reports disagree: a one-time $5 credit for 30 days, then about $1 a month. It runs out, so it is a trial, not free. Connector written from the docs, not tried.',
     url: 'https://railway.com/pricing',
   },
   {
