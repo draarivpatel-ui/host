@@ -30,6 +30,8 @@ a{color:inherit}.m{font-family:var(--mono);text-transform:uppercase;letter-spaci
 @media (max-width:600px){.top .brand{padding:0 12px}.top{height:auto;flex-wrap:wrap}.top .brand{height:54px}.top nav{display:none}.top .cta{margin-left:auto;height:54px}.top .swp{order:3;width:100%;border-right:0;border-top:1px solid var(--ink);padding:8px 12px}.swp span{display:flex;width:100%}.swp a{flex:1;justify-content:center;padding:7px 4px}.top nav{gap:14px;padding:0 12px;flex:1;min-width:0;overflow-x:auto;scrollbar-width:none}.top nav a{white-space:nowrap}.top .cta{padding:0 14px}}
 h1{font:800 clamp(34px,6vw,60px)/1.02 var(--serif);margin:48px 0 14px}h2{font:800 24px/1.1 var(--serif);margin:44px 0 12px}
 .lede{max-width:640px;color:var(--dim);font-size:17px}
+.flow{display:flex;align-items:stretch;gap:6px;margin:22px 0;max-width:560px}.flow>div{flex:1;min-width:0;border:1px solid var(--ink);background:var(--card);padding:10px 8px;text-align:center;font-weight:600;font-size:14px;line-height:1.25}.flow small{display:block;font-weight:400;font-size:11px;color:var(--dim);margin-top:3px}.flow>i{align-self:center;font-style:normal;font-size:20px;color:var(--dim)}
+.links{display:flex;flex-wrap:wrap;gap:6px 18px;margin:0 0 8px;font-size:15px}.links a{color:var(--ink);text-decoration:underline;text-underline-offset:3px}
 .fam{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid var(--ink);margin:24px 0}.fam div{padding:14px;border-right:1px solid var(--ink)}.fam div:last-child{border:0}
 .fam b{display:block;font-family:var(--mono)}.fam span{color:var(--dim)}
 .hosts{display:grid;gap:0;border:1px solid var(--ink)}.h{padding:16px;border-bottom:1px solid var(--ink);background:var(--card)}.h:last-child{border:0}
@@ -139,6 +141,8 @@ ${FONT_PRECONNECT}<link rel="stylesheet" href="https://fonts.googleapis.com/css2
 ${topbar({ name: 'Host', mark: HOST_MARK, sw: SWITCH('host'), nav: SITE_NAV, cta: ['/console', 'Console'] })}<div class="pad">
 <h1>Run your AI agent for free.</h1>
 <p class="lede">An agent needs a computer that stays on. This page lists the free ones we checked, and the catch for each. It is a guide: nothing to sign up for here. (A "pod" is just the small space one agent runs in.) Want a hosted sandbox instead? See the <a href="/rating">rating of sandboxes with no card and a link</a>.</p>
+<div class="flow"><div>Your agent<small>the thing you built</small></div><i>→</i><div>A free machine<small>from the list below</small></div><i>→</i><div>Runs for you<small>mind the catch</small></div></div>
+<div class="links"><a href="#setup">Set it up in 4 steps →</a><a href="https://github.com/flisk-sh/fleet/tree/main/fleetd">fleetd on GitHub →</a><a href="https://fleet.flisk.si">Fleet →</a><a href="https://inference.flisk.si">Free AI models →</a></div>
 <div class="fam"><div><b>inference</b><span>free AI models</span></div><div><b>fleet</b><span>safe places for agents</span></div><div><b>host</b><span>free places to run them</span></div></div>
 <h2>Where</h2>
 <div class="hosts">${rows}</div>
