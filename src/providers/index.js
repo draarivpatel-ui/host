@@ -4,8 +4,10 @@ import render from './render.js';
 import fly from './fly.js';
 import koyeb from './koyeb.js';
 import northflank from './northflank.js';
+import railway from './railway.js';
+import snapdeploy from './snapdeploy.js';
 
-export const PROVIDERS = { render, fly, koyeb, northflank, demo };
+export const PROVIDERS = { render, fly, koyeb, northflank, railway, snapdeploy, demo };
 export const hostRef = (provider, id) => `host_${provider}_${id}`;
 export const parseRef = (ref) => {
   const m = /^host_([a-z0-9]+)_(.+)$/.exec(ref || '');
