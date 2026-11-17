@@ -119,6 +119,8 @@ describe('cabinet reloads', () => {
     let h = await (await get(env, c, '/console?section=hosts')).text();
     expect(h).toContain('not chosen yet');
     expect(h).toMatch(/name="provider" value="render" disabled/);
+    expect(h).toContain('connector not run yet');
+    expect(h).not.toMatch(/>untested</);
     expect(h).toMatch(/name="provider" value="demo"(?! disabled)/);
     // a provider that is not connected cannot become the default
     expect(await (await post(env, c, '/console/default', { provider: 'render' })).text()).toContain('Connect that provider first');

@@ -43,7 +43,7 @@ function pickerHtml({ connections, defaultProvider, canConnect }) {
       const ok = usable(id);
       const catchText = h ? h.catch : 'A pretend host that needs no account. The address does not exist.';
       const state = ok ? (p.demo ? 'No account needed' : `Connected · key ending ${esc(connections[id].hint)}`) : 'Not connected';
-      return `<label class="pk${defaultProvider === id ? ' sel' : ''}${ok ? '' : ' off'}"><input type="radio" name="provider" value="${id}"${ok ? '' : ' disabled'}${defaultProvider === id ? ' checked' : ''} required><span><b>${esc(p.label)}</b>${defaultProvider === id ? ' <span class="tag use">Your default</span>' : ''}${p.untested ? ' <span class="tag unchecked">untested</span>' : ''}<br><span class="note">${state}.${ok ? '' : canConnect ? ` <a href="/console?section=providers#${id}">Connect it</a>` : ''}</span><br><span class="note">${esc(catchText)}</span></span></label>`;
+      return `<label class="pk${defaultProvider === id ? ' sel' : ''}${ok ? '' : ' off'}"><input type="radio" name="provider" value="${id}"${ok ? '' : ' disabled'}${defaultProvider === id ? ' checked' : ''} required><span><b>${esc(p.label)}</b>${defaultProvider === id ? ' <span class="tag use">Your default</span>' : ''}${p.untested ? ' <span class="tag unchecked" title="The provider itself is fine. Host&#39;s connector for it has not started a pod host on a real account yet.">connector not run yet</span>' : ''}<br><span class="note">${state}.${ok ? '' : canConnect ? ` <a href="/console?section=providers#${id}">Connect it</a>` : ''}</span><br><span class="note">${esc(catchText)}</span></span></label>`;
     })
     .join('');
   return cards;
