@@ -53,7 +53,7 @@ function hostsSection({ hosts, connections, defaultProvider, canConnect, notice,
   const live = hosts.filter((h) => !h.removed);
   const defLabel = defaultProvider && PROVIDERS[defaultProvider] ? PROVIDERS[defaultProvider].label : null;
   const form = `<form method="post" action="/console/hosts" id="picker"><div class="picker" role="radiogroup" aria-label="Hosting provider">${pickerHtml({ connections, defaultProvider, canConnect })}</div>
-<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px"><button class="btn g" type="submit">Start a pod host</button><label class="note"><input type="checkbox" name="remember" value="1"> Make this my default</label><button class="btn o" type="submit" formaction="/console/default">Only set as default</button></div></form>`;
+<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px"><button class="btn g" type="submit">Start a pod host</button><button class="btn o" type="submit" formaction="/console/default">Set as default</button></div></form>`;
   const rows = live
     .map(
       (h) => `<tr><td><code>${esc(h.id)}</code></td><td>${esc(h.provider)}</td><td><code>${esc(h.url)}</code></td><td>${esc(when(h.created))}</td><td><form method="post" action="/console/hosts/${encodeURIComponent(h.id)}/stop"><button class="btn o" type="submit">Stop</button></form></td></tr>`,
