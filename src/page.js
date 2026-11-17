@@ -152,5 +152,11 @@ ${topbar({ name: 'Host', mark: HOST_MARK, sw: SWITCH('host'), nav: SITE_NAV, cta
 <li>Easiest: run the ready-made image <code>ghcr.io/flisk-sh/fleetd:latest</code> (port 7860). Or put <code>fleetd.mjs</code> from <a href="https://github.com/flisk-sh/fleet/tree/main/fleetd">the fleet repo</a> and this <code>Dockerfile</code> in a folder and build it:<pre>${esc(DOCKERFILE)}</pre></li>
 <li>In the host's settings add a secret <code>FLEETD_TOKEN</code>: any random string of 16 or more characters.</li>
 <li>In fleet, connect the provider <b>Fleet pod</b> with <code>token@https://your-host-address</code>. Check it first: <code>curl https://your-host-address/health</code> answers <code>{"ok":true}</code>.</li></ol>
+<h2 id="bench">Time your own pods</h2>
+<p class="note">Want to know if running many pods at once helps your agent? Fleet has a bench you can run with your own keys. Nothing is sent to us. It runs the same tasks one at a time, many at a time, and on warm pods, then prints the times and any failures.</p>
+<ol><li>Get the fleet repo: <code>git clone https://github.com/flisk-sh/fleet</code>.</li>
+<li>No account needed to try it: <code>bun scripts/bench-local.mjs</code> runs it against a fleetd on your own computer.</li>
+<li>For your own host or cloud: <code>FLEET_KEY=fleet_... PROVIDER=fleetpod PROVIDER_KEY=token@https://your-host-address bun scripts/bench-fanout.mjs</code>.</li></ol>
+<p class="note">Many pods at once is faster when your tasks do not depend on each other. Read the failed column too: a fast run that fails is not a result.</p>
 </div></div></body></html>`;
 }

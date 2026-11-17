@@ -84,6 +84,7 @@ describe('standard header', () => {
     expect(html).toContain('<a class="brand" href="/"');
     expect(html).toContain('<a class="cta" href="/console">Console');
     expect(html).toContain('id="setup"');
+    expect(html).toContain('id="bench"');
     expect(html).toContain('<a class="on" aria-current="true" href="/"><i></i>host</a>');
   });
 });
