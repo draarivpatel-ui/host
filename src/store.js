@@ -89,3 +89,16 @@ export async function getHost(env, login, ref) {
 export async function markHostRemoved(env, login, ref) {
   await env.DB.prepare('UPDATE hosts SET removed = ? WHERE login = ? AND ref = ? AND removed IS NULL').bind(nowIso(), login, ref).run();
 }
+
+// ---- the provider a person starts hosts on by default. Missing table (old database) reads as "none".
+export async function getDefaultProvider(env, login) {
+  try {
+    const r = await env.DB.prepare('SELECT default_provider FROM prefs WHERE login = ?').bind(login).first();
+    return r ? r.default_provider : null;
+  } catch {
+    return null;
+  }
+}
+export async function setDefaultProvider(env, login, provider) {
+  await env.DB.prepare('INSERT INTO prefs (login, default_provider, updated) VALUES (?, ?, ?) ON CONFLICT(login) DO UPDATE SET default_provider = excluded.default_provider, updated = excluded.updated').bind(login, provider, nowIso()).run();
+}

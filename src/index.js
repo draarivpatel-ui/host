@@ -6,7 +6,7 @@ import { PROVIDERS, hostRef, parseRef } from './providers/index.js';
 import { bearer, githubAuthorizeUrl, githubLogin, newToken } from './auth.js';
 import { clearSession, makeSession, readSession, sameOrigin } from './session.js';
 import { vaultReady } from './vault.js';
-import { connectProvider, createKey, disconnectProvider, getHost, listConnections, listHosts, listKeys, loginForKey, markHostRemoved, providerKey, recordHost, revokeKey } from './store.js';
+import { getDefaultProvider, setDefaultProvider, connectProvider, createKey, disconnectProvider, getHost, listConnections, listHosts, listKeys, loginForKey, markHostRemoved, providerKey, recordHost, revokeKey } from './store.js';
 import { overMinuteLimit } from './limit.js';
 import { withSecurityHeaders } from './security-headers.js';
 
@@ -124,7 +124,7 @@ export async function handle(request, env = {}, opts = {}) {
     const { login } = session;
     const canConnect = vaultReady(env);
     const page = async (section, extra = {}) =>
-      html(cabinetPage({ origin, login, section, canConnect, hosts: await listHosts(env, login), keys: await listKeys(env, login), connections: await listConnections(env, login), ...extra }), 200, { 'cache-control': 'no-store' });
+      html(cabinetPage({ origin, login, section, canConnect, hosts: await listHosts(env, login), defaultProvider: await getDefaultProvider(env, login), keys: await listKeys(env, login), connections: await listConnections(env, login), ...extra }), 200, { 'cache-control': 'no-store' });
     if (request.method === 'GET' && path === '/console') return page(url.searchParams.get('section') === 'providers' ? 'hosts' : url.searchParams.get('section') || 'overview');
     // A result page (after Start, Connect, Create key) sits at /console/<section>; a reload must not 404.
     const where = request.method === 'GET' && /^\/console\/(overview|hosts|providers|keys|docs)$/.exec(path);
@@ -152,8 +152,17 @@ export async function handle(request, env = {}, opts = {}) {
         const done = await connectProvider(env, login, provider, form?.get('key'));
         return page('hosts', done.error ? { error: done.error } : { notice: `${providers[provider].label} connected.` });
       }
+      if (path === '/console/default') {
+        const provider = String(form?.get('provider') || '');
+        const usable = providers[provider] && (providers[provider].demo || (await listConnections(env, login))[provider]);
+        if (!usable) return page('hosts', { error: 'Connect that provider first, then make it your default.' });
+        await setDefaultProvider(env, login, provider);
+        return page('hosts', { notice: `${providers[provider].label} is now your default.` });
+      }
       if (path === '/console/hosts') {
-        const made = await startHost(env, login, String(form?.get('provider') || ''), { fetchImpl, providers });
+        const provider = String(form?.get('provider') || '');
+        const made = await startHost(env, login, provider, { fetchImpl, providers });
+        if (!made.error) await setDefaultProvider(env, login, provider);
         return page('hosts', made.error ? { error: made.error } : { fresh: made.host });
       }
       m = /^\/console\/hosts\/([^/]+)\/stop$/.exec(path);

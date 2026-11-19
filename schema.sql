@@ -33,3 +33,10 @@ CREATE TABLE IF NOT EXISTS hosts (
 );
 CREATE INDEX IF NOT EXISTS hosts_login ON hosts (login, created);
 CREATE INDEX IF NOT EXISTS hosts_ref ON hosts (login, ref);
+
+-- The hosting provider a person starts hosts on by default (the picker in the cabinet). Never a key.
+CREATE TABLE IF NOT EXISTS prefs (
+  login TEXT PRIMARY KEY,
+  default_provider TEXT NOT NULL,
+  updated TEXT NOT NULL
+);

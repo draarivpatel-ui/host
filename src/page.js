@@ -140,17 +140,23 @@ ${FONT_PRECONNECT}<link rel="stylesheet" href="https://fonts.googleapis.com/css2
 <style>${CSS}</style><script defer data-domain="host.flisk.si" src="https://flisk.sh/a.js"></script><script src="https://flisk.si/assets/bar.js" defer></script></head><body><div class="frame">
 ${topbar({ name: 'Host', mark: HOST_MARK, sw: SWITCH('host'), nav: SITE_NAV, cta: ['/console', 'Console'] })}<div class="pad">
 <h1>Run your AI agent for free.</h1>
-<p class="lede">An agent needs a computer that stays on. This page lists the free ones we checked, and the catch for each. It is a guide: nothing to sign up for here. (A "pod" is just the small space one agent runs in.) Want a hosted sandbox instead? See the <a href="/rating">rating of sandboxes with no card and a link</a>.</p>
+<p class="lede">An agent needs a computer that stays on. Here are the free ones we checked, and the catch for each. Nothing to sign up for here.</p>
 <div class="flow"><div>Your agent<small>the thing you built</small></div><i>→</i><div>A free machine<small>from the list below</small></div><i>→</i><div>Runs for you<small>mind the catch</small></div></div>
 <div class="links"><a href="#setup">Set it up in 4 steps →</a><a href="https://github.com/flisk-sh/fleet/tree/main/fleetd">fleetd on GitHub →</a><a href="https://fleet.flisk.si">Fleet →</a><a href="https://inference.flisk.si">Free AI models →</a></div>
 <div class="fam"><div><b>inference</b><span>free AI models</span></div><div><b>fleet</b><span>safe places for agents</span></div><div><b>host</b><span>free places to run them</span></div></div>
 <h2>Where</h2>
 <div class="hosts">${rows}</div>
-<p class="note">Checked ${esc(CHECKED)} from each vendor's public page and our own tries. Limits change: read the vendor's page before you rely on one. Pods on these hosts are not sandboxes: use them for your own agents, never for strangers' code.</p>
+<p class="note">A "pod" is the small space one agent runs in. Want a hosted sandbox instead? See the <a href="/rating">rating of sandboxes with no card and a link</a>.</p><p class="note">Checked ${esc(CHECKED)} from each vendor's public page and our own tries. Limits change: read the vendor's page before you rely on one. Pods on these hosts are not sandboxes: use them for your own agents, never for strangers' code.</p>
 <h2 id="setup">Set up fleetd on any Docker host in 4 steps</h2>
 <ol><li>Get a host that runs Docker and has a public https address (pick one above). Keep its address.</li>
 <li>Easiest: run the ready-made image <code>ghcr.io/flisk-sh/fleetd:latest</code> (port 7860). Or put <code>fleetd.mjs</code> from <a href="https://github.com/flisk-sh/fleet/tree/main/fleetd">the fleet repo</a> and this <code>Dockerfile</code> in a folder and build it:<pre>${esc(DOCKERFILE)}</pre></li>
 <li>In the host's settings add a secret <code>FLEETD_TOKEN</code>: any random string of 16 or more characters.</li>
 <li>In fleet, connect the provider <b>Fleet pod</b> with <code>token@https://your-host-address</code>. Check it first: <code>curl https://your-host-address/health</code> answers <code>{"ok":true}</code>.</li></ol>
+<h2 id="bench">Time your own pods</h2>
+<p class="note">Want to know if running many pods at once helps your agent? Fleet has a bench you can run with your own keys. Nothing is sent to us. It runs the same tasks one at a time, many at a time, and on warm pods, then prints the times and any failures.</p>
+<ol><li>Get the fleet repo: <code>git clone https://github.com/flisk-sh/fleet</code>.</li>
+<li>No account needed to try it: <code>bun scripts/bench-local.mjs</code> runs it against a fleetd on your own computer.</li>
+<li>For your own host or cloud: <code>FLEET_KEY=fleet_... PROVIDER=fleetpod PROVIDER_KEY=token@https://your-host-address bun scripts/bench-fanout.mjs</code>.</li></ol>
+<p class="note">Many pods at once is faster when your tasks do not depend on each other. Read the failed column too: a fast run that fails is not a result.</p>
 </div></div></body></html>`;
 }
