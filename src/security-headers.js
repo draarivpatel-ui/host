@@ -3,7 +3,7 @@
 // Strict-Transport-Security gets includeSubDomains and the CSP gets frame-ancestors when they lack it.
 
 // Default policy for a response that sets none: https-only sources, inline code allowed, no plugins, no foreign framing.
-const DEFAULT_CSP = "default-src 'self'; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: blob: https:; font-src 'self' data: https:; connect-src 'self' https: wss:; media-src 'self' https:; frame-src 'self' https:; worker-src 'self' blob:; object-src 'none'; frame-ancestors 'self'; base-uri 'self'; form-action 'self' https:";
+const DEFAULT_CSP = "default-src 'self'; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: blob: https:; font-src 'self' data: https:; connect-src 'self' https: wss:; media-src 'self' https:; frame-src 'self' https:; worker-src 'self' blob:; object-src 'none'; frame-ancestors 'self' https://analytics.flisk.si; base-uri 'self'; form-action 'self' https:";
 
 const DEFAULTS = {
   'x-content-type-options': 'nosniff',
@@ -28,6 +28,6 @@ export function withSecurityHeaders(response, { permissionsPolicy } = {}) {
   }
   const csp = h.get('content-security-policy');
   if (!csp) h.set('content-security-policy', DEFAULT_CSP);
-  else if (!/(^|;)\s*frame-ancestors\b/i.test(csp)) h.set('content-security-policy', `${csp.replace(/;\s*$/, '')}; frame-ancestors 'self'`);
+  else if (!/(^|;)\s*frame-ancestors\b/i.test(csp)) h.set('content-security-policy', `${csp.replace(/;\s*$/, '')}; frame-ancestors 'self' https://analytics.flisk.si`);
   return out;
 }
