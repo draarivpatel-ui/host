@@ -82,6 +82,11 @@ describe('standard header', () => {
   test('brand, nav and the green call-to-action, same markup as fleet', async () => {
     const html = await (await get('/')).text();
     expect(html).toContain('<a class="brand" href="/"');
+    // One logo only: the org bar above carries the icon, so the header keeps the wordmark and no icon.
+    const brand = /<a class="brand"[^>]*>(.*?)<\/a>/.exec(html)[1];
+    expect(brand).toBe('<b>Host</b>');
+    expect(brand).not.toContain('<svg');
+    expect(brand).not.toContain('class="tile"');
     expect(html).toContain('<a class="cta" href="/console">Console');
     expect(html).toContain('id="setup"');
     expect(html).toContain('id="bench"');
