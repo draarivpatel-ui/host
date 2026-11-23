@@ -1,6 +1,6 @@
 import { HOSTS, CHECKED } from './hosts.js';
 import { ranked, RATED } from './rating.js';
-import { hostsPage, ratingPage } from './page.js';
+import { esc, hostsPage, ratingPage } from './page.js';
 import { cabinetPage, docsPage, messagePage } from './console.js';
 import { PROVIDERS, hostRef, parseRef } from './providers/index.js';
 import { bearer, githubAuthorizeUrl, githubLogin, newToken } from './auth.js';
@@ -100,7 +100,7 @@ export async function stopHost(env, login, ref, { fetchImpl = fetch, providers =
   return { ok: true };
 }
 
-export async function handle(request, env = {}, opts = {}) {
+async function route(request, env = {}, opts = {}) {
   // HEAD is GET without the body.
   if (request.method === 'HEAD') {
     const r = await handle(new Request(request.url, { method: 'GET', headers: request.headers }), env, opts);
@@ -245,6 +245,22 @@ export async function handle(request, env = {}, opts = {}) {
   }
   if (request.method !== 'GET' && request.method !== 'HEAD') return new Response('method not allowed', { status: 405, headers: { allow: 'GET' } });
   return notFound();
+}
+
+// The second-level header carries an empty [data-flisk-login] element; for a signed-in visitor it is filled with the login, so the
+// org bar's profile icon can read it. Those responses are per-visitor, so they are private and never cached. Signed-out pages are untouched.
+const LOGIN_HOOK = '<span data-flisk-login hidden></span>';
+export async function handle(request, env = {}, opts = {}) {
+  const res = await route(request, env, opts);
+  if (request.method !== 'GET' || !/_sess=/.test(request.headers.get('cookie') || '') || !(res.headers.get('content-type') || '').startsWith('text/html')) return res;
+  const login = (await readSession(env, request))?.login;
+  if (!login) return res;
+  const body = await res.text();
+  if (!body.includes(LOGIN_HOOK)) return new Response(body, res);
+  const out = new Response(body.replace(LOGIN_HOOK, `<span data-flisk-login hidden>${esc(login)}</span>`), res);
+  out.headers.set('cache-control', 'private, no-store');
+  out.headers.append('vary', 'Cookie');
+  return out;
 }
 
 export default { fetch: async (request, env) => withSecurityHeaders(await handle(request, env)) };

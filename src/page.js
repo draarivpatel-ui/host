@@ -59,6 +59,7 @@ export const topbar = ({ name, mark, nav, cta, sw = [], current = '' }) =>
   `<div class="top m"><a class="brand" href="/" aria-label="${esc(name)} home"><span class="tile">${mark}</span><b>${esc(name)}</b></a>` +
   (sw.length ? `<div class="swp"><span aria-label="Flisk pod products">${sw.map(([href, label, on]) => `<a${on ? ' class="on" aria-current="true"' : ''} href="${esc(href)}"><i></i>${esc(label)}</a>`).join('')}</span></div>` : '') +
   `<nav aria-label="${esc(name)}">${nav.map(([href, label, cls = '']) => `<a${cls ? ` class="${cls}"` : ''} href="${esc(href)}"${href === current ? ' aria-current="page"' : ''}>${esc(label)}</a>`).join('')}</nav>` +
+  `<span data-flisk-login hidden></span>` +
   `<a class="cta" href="${esc(cta[0])}">${esc(cta[1])} <i aria-hidden="true">→</i></a></div>`;
 
 export const SWITCH = (on) => [['https://fleet.flisk.si', 'fleet', on === 'fleet'], ['https://fleet.flisk.si/podlytics', 'podlytics'], ['/', 'host', on === 'host']];
