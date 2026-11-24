@@ -4,6 +4,8 @@ import { call, FLEETD_IMAGE } from './http.js';
 
 const API = 'https://api.machines.dev/v1';
 const auth = (key) => ({ authorization: `Bearer ${key}` });
+const deleteApp = (fetchImpl, key, id) =>
+  call(fetchImpl, `${API}/apps/${encodeURIComponent(id)}`, { method: 'DELETE', headers: auth(key) });
 
 export default {
   label: 'Fly.io',
@@ -24,11 +26,15 @@ export default {
           services: [{ protocol: 'tcp', internal_port: 7860, ports: [{ port: 443, handlers: ['tls', 'http'] }, { port: 80, handlers: ['http'] }] }],
         },
       },
+    }).catch(async (error) => {
+      // The app was created above; roll it back without hiding the machine error.
+      await deleteApp(fetchImpl, apiKey, name).catch(() => {});
+      throw error;
     });
     return { id: name, url: `https://${name}.fly.dev` };
   },
   async remove(key, id, { fetchImpl = fetch } = {}) {
     const apiKey = String(key).includes(':') ? String(key).split(':').slice(1).join(':') : key;
-    await call(fetchImpl, `${API}/apps/${encodeURIComponent(id)}`, { method: 'DELETE', headers: auth(apiKey) });
+    await deleteApp(fetchImpl, apiKey, id);
   },
 };
