@@ -10,8 +10,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.55 var(--sans
 a{color:inherit}.m{font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em;font-size:12px}
 .frame{max-width:980px;margin:0 auto;padding:0 0 64px;border-left:1px solid var(--ink);border-right:1px solid var(--ink)}.pad{padding:0 16px}
 .top{display:flex;align-items:stretch;border-bottom:1px solid var(--ink);height:56px;position:relative}
-.top .brand{display:flex;align-items:center;gap:11px;padding:0 20px;text-decoration:none;border-right:1px solid var(--ink);font:800 23px/1 var(--serif);letter-spacing:-.015em;text-transform:none}
-.top .tile{display:grid;place-items:center;width:34px;height:34px;flex-shrink:0}.top .tile svg{width:34px;height:34px}
+.top .brand{display:flex;align-items:center;padding:0 20px;text-decoration:none;border-right:1px solid var(--ink);font:800 23px/1 var(--serif);letter-spacing:-.015em;text-transform:none}
 .top .swp{display:flex;align-items:center;padding:0 14px;border-right:1px solid var(--ink)}
 .swp span{display:inline-flex;border:1px solid var(--ink);padding:3px;gap:3px;background:var(--card)}
 .swp a{display:inline-flex;align-items:center;gap:7px;padding:6px 11px;text-decoration:none;color:var(--dim);transition:background .15s,color .15s}
@@ -54,9 +53,8 @@ EXPOSE 7860
 CMD ["node", "fleetd.mjs"]`;
 
 // The standard Flisk second-level header (same as fleet's topbar in flisk-sh/fleet src/page.js): keep the two in step.
-export const HOST_MARK = '<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><rect width="64" height="64" rx="14" fill="#0b0b0d"/><rect x="12" y="14" width="40" height="10" rx="3" fill="#fbfaf7" opacity=".25"/><rect x="12" y="27" width="40" height="10" rx="3" fill="#fbfaf7" opacity=".25"/><rect x="12" y="40" width="40" height="10" rx="3" fill="#16a34a"/><circle cx="46" cy="45" r="2.5" fill="#0b0b0d"/></svg>';
-export const topbar = ({ name, mark, nav, cta, sw = [], current = '' }) =>
-  `<div class="top m"><a class="brand" href="/" aria-label="${esc(name)} home"><span class="tile">${mark}</span><b>${esc(name)}</b></a>` +
+export const topbar = ({ name, nav, cta, sw = [], current = '' }) =>
+  `<div class="top m"><a class="brand" href="/" aria-label="${esc(name)} home"><b>${esc(name)}</b></a>` +
   (sw.length ? `<div class="swp"><span aria-label="Flisk pod products">${sw.map(([href, label, on]) => `<a${on ? ' class="on" aria-current="true"' : ''} href="${esc(href)}"><i></i>${esc(label)}</a>`).join('')}</span></div>` : '') +
   `<nav aria-label="${esc(name)}">${nav.map(([href, label, cls = '']) => `<a${cls ? ` class="${cls}"` : ''} href="${esc(href)}"${href === current ? ' aria-current="page"' : ''}>${esc(label)}</a>`).join('')}</nav>` +
   `<span data-flisk-login hidden></span>` +
@@ -86,7 +84,7 @@ export const shell = ({ title, description = '', canonical = '', body, extraCss 
 ${headMetadata({ title, description, canonical, noindex })}
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%2322c55e'/%3E%3C/svg%3E"><link rel="apple-touch-icon" href="/apple-touch-icon.png">
 ${FONT_PRECONNECT}${FONTS}<style>${CSS}${extraCss}</style><script defer data-domain="host.flisk.si" src="https://flisk.sh/a.js"></script><script src="https://flisk.si/assets/bar.js" data-product="Host" data-icon="host" data-accent="#16a34a" data-text="Free places to run your own agent pods." defer></script></head><body><div class="frame">
-${topbar({ name: 'Host', mark: HOST_MARK, sw: SWITCH('host'), nav: SITE_NAV, cta })}${body}</div></body></html>`;
+${topbar({ name: 'Host', sw: SWITCH('host'), nav: SITE_NAV, cta })}${body}</div></body></html>`;
 
 const RATING_CSS = `
 .rt{width:100%;border-collapse:collapse;border:1px solid var(--ink);background:var(--card);font-size:14px}
@@ -144,7 +142,7 @@ ${headMetadata({
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%2322c55e'/%3E%3C/svg%3E"><link rel="apple-touch-icon" href="/apple-touch-icon.png">
 ${FONT_PRECONNECT}<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,800&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>${CSS}</style><script defer data-domain="host.flisk.si" src="https://flisk.sh/a.js"></script><script src="https://flisk.si/assets/bar.js" data-product="Host" data-icon="host" data-accent="#16a34a" data-text="Free places to run your own agent pods." defer></script></head><body><div class="frame">
-${topbar({ name: 'Host', mark: HOST_MARK, sw: SWITCH('host'), nav: SITE_NAV, cta: ['/console', 'Console'] })}<div class="pad">
+${topbar({ name: 'Host', sw: SWITCH('host'), nav: SITE_NAV, cta: ['/console', 'Console'] })}<div class="pad">
 <h1>Run your AI agent for free.</h1>
 <p class="lede">An agent needs a computer that stays on. Here are the free ones we checked, and the catch for each. Nothing to sign up for here.</p>
 <div class="flow"><div>Your agent<small>the thing you built</small></div><i>→</i><div>A free machine<small>from the list below</small></div><i>→</i><div>Runs for you<small>mind the catch</small></div></div>
