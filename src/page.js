@@ -42,6 +42,10 @@ ol{padding-left:20px}li{margin:6px 0}code{font-family:var(--mono);font-size:13px
 .note{color:var(--dim);font-size:13px;margin-top:28px}
 .getkey{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin:18px 0}.getkey span{color:var(--dim);font-size:14px}
 .btn-key{display:inline-block;background:var(--green);color:#04130a;font-weight:600;font-size:16px;padding:12px 22px;border:1px solid var(--ink);text-decoration:none}.btn-key:hover{background:#22c55e}
+@property --next-cta-angle{syntax:'<angle>';inherits:false;initial-value:0deg}
+@keyframes next-cta-spin{to{--next-cta-angle:360deg}}
+.next-cta{border:2px solid transparent;background:linear-gradient(var(--green),var(--green)) padding-box,conic-gradient(from var(--next-cta-angle),var(--green),var(--red),var(--ink),var(--dim),var(--green)) border-box;animation:next-cta-spin 3s linear infinite}.next-cta:hover{background:linear-gradient(#22c55e,#22c55e) padding-box,conic-gradient(from var(--next-cta-angle),var(--green),var(--red),var(--ink),var(--dim),var(--green)) border-box}
+@media (prefers-reduced-motion:reduce){.next-cta{animation:none;--next-cta-angle:135deg}}
 @media (max-width:640px){.fam{grid-template-columns:1fr}.fam div{border-right:0;border-bottom:1px solid var(--ink)}}
 `;
 
@@ -150,7 +154,7 @@ ${FONT_PRECONNECT}<link rel="stylesheet" href="https://fonts.googleapis.com/css2
 ${topbar({ name: 'Host', sw: SWITCH('host'), nav: SITE_NAV, cta: ['/console', 'Console'] })}<div class="pad">
 <h1>Run your AI agent for free.</h1>
 <p class="lede">Sign in to get a free key. It starts your AI agent on a free computer that stays on. Below, every free option we checked and its catch.</p>
-<p class="getkey"><a class="btn-key" href="${FREE_KEY_HREF}">Get a free API key</a><span>No card. Sign in with GitHub.</span></p>
+<p class="getkey"><a class="btn-key next-cta" data-next-cta href="${FREE_KEY_HREF}">Get a free API key</a><span>No card. Sign in with GitHub.</span></p>
 <div class="flow"><div>Your agent<small>the thing you built</small></div><i>→</i><div>A free machine<small>from the list below</small></div><i>→</i><div>Runs for you<small>mind the catch</small></div></div>
 <div class="links"><a href="#setup">Set it up in 4 steps →</a><a href="https://github.com/flisk-sh/fleet/tree/main/fleetd">fleetd on GitHub →</a><a href="https://fleet.flisk.si">Fleet →</a><a href="https://inference.flisk.si">Free AI models →</a></div>
 <div class="fam"><div><b>inference</b><span>free AI models</span></div><div><b>fleet</b><span>safe places for agents</span></div><div><b>host</b><span>free places to run them</span></div></div>
