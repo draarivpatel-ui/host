@@ -44,7 +44,7 @@ ol{padding-left:20px}li{margin:6px 0}code{font-family:var(--mono);font-size:13px
 .btn-key{display:inline-block;background:var(--green);color:#04130a;font-weight:600;font-size:16px;padding:12px 22px;border:1px solid var(--ink);text-decoration:none}.btn-key:hover{background:#22c55e}
 @property --next-cta-angle{syntax:'<angle>';inherits:false;initial-value:0deg}
 @keyframes next-cta-spin{to{--next-cta-angle:360deg}}
-.next-cta{border:2px solid transparent;background:linear-gradient(var(--green),var(--green)) padding-box,conic-gradient(from var(--next-cta-angle),var(--green),var(--red),var(--ink),var(--dim),var(--green)) border-box;animation:next-cta-spin 3s linear infinite}.next-cta:hover{background:linear-gradient(#22c55e,#22c55e) padding-box,conic-gradient(from var(--next-cta-angle),var(--green),var(--red),var(--ink),var(--dim),var(--green)) border-box}
+.next-cta{border:2px solid transparent;background:linear-gradient(var(--green),var(--green)) padding-box,conic-gradient(from var(--next-cta-angle),#ef4444,#f59e0b,#eab308,#22c55e,#3b82f6,#8b5cf6,#ef4444) border-box;animation:next-cta-spin 3s linear infinite}.next-cta:hover{background:linear-gradient(#22c55e,#22c55e) padding-box,conic-gradient(from var(--next-cta-angle),#ef4444,#f59e0b,#eab308,#22c55e,#3b82f6,#8b5cf6,#ef4444) border-box}
 @media (prefers-reduced-motion:reduce){.next-cta{animation:none;--next-cta-angle:135deg}}
 @media (max-width:640px){.fam{grid-template-columns:1fr}.fam div{border-right:0;border-bottom:1px solid var(--ink)}}
 `;
