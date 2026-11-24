@@ -94,6 +94,24 @@ describe('standard header', () => {
   });
 });
 
+describe('free key button', () => {
+  test('hero has the standard primary button, proof line and short copy', async () => {
+    const html = await (await get('/')).text();
+    expect(html).toContain('href="/auth/start?next=%2Fconsole%3Fsection%3Dkeys&utm_source=host&utm_medium=cta&utm_campaign=free-key">Get a free API key</a>');
+    expect(html).toContain('No card. Sign in with GitHub.');
+    const h1 = /<h1>(.*?)<\/h1>/.exec(html)[1];
+    const lede = /<p class="lede">(.*?)<\/p>/.exec(html)[1];
+    expect(h1.split(/\s+/).length).toBeLessThanOrEqual(12);
+    expect(lede.split(/\s+/).length).toBeLessThanOrEqual(32);
+    expect(h1 + lede).not.toMatch(/\b(pod|endpoint|MCP|inference|orchestration|daemon)\b/i);
+  });
+  test('the sign-in route ignores the utm params and returns to the keys page', async () => {
+    const r = await handle(new Request('https://host.test/auth/start?next=%2Fconsole%3Fsection%3Dkeys&utm_source=host&utm_medium=cta&utm_campaign=free-key'), { DB: {}, SESSION_SECRET: 's', DEV_LOGIN: 'x' });
+    expect(r.status).toBe(303);
+    expect(r.headers.get('location')).toBe('/console?section=keys');
+  });
+});
+
 describe('guide accuracy', () => {
   test('the Dockerfile on the page makes fleetd reachable and the image is named', async () => {
     const html = await (await handle(new Request('https://host.test/'))).text();
