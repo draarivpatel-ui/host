@@ -33,7 +33,7 @@ describe('next-cta marker on the home page', () => {
 describe('next-cta rainbow border', () => {
   test('the conic-gradient uses the six rainbow stops, not theme ink/dim', async () => {
     const h = await html();
-    const grads = [...h.matchAll(/\.next-cta[^{]*\{[^}]*conic-gradient\([^)]*\)/g)].map((m) => m[0]);
+    const grads = [...h.matchAll(/\.next-cta[^{]*\{[^}]*conic-gradient\((?:[^()]|\([^()]*\))*\)/g)].map((m) => m[0]);
     expect(grads.length).toBeGreaterThanOrEqual(2); // normal and :hover
     for (const g of grads) {
       for (const hex of ['#ef4444', '#f59e0b', '#eab308', '#22c55e', '#3b82f6', '#8b5cf6']) expect(g).toContain(hex);
