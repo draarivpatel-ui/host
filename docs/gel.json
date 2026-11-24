@@ -8,7 +8,11 @@
     "done-without-green": "block",
     "api-contract": "block",
     "migrations-append-only": "block",
-    "next-cta": "block"
+    "next-cta": "block",
+    "repo-health": "report",
+    "status-declared": "report",
+    "dependabot-config": "report",
+    "north-star": "report"
   },
   "next_cta": {
     "rendered": {
