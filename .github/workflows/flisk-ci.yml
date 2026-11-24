@@ -30,7 +30,7 @@ jobs:
 
   build-test:
     if: github.event_name != 'schedule'
-    uses: flisk-sh/.github/.github/workflows/ci.yml@fix/ci-bun-ruby-toolchains # test
+    uses: flisk-sh/.github/.github/workflows/ci.yml@2ce3f625cefb71734d66c0cafe15a43855dc88b3 # fix/ci-bun-ruby-toolchains # test
 
   dependency-review:
     if: github.event_name == 'pull_request'
