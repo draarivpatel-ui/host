@@ -18,5 +18,16 @@
     "rendered": {
       "result": "bench/five-second.json"
     }
+  },
+  "status": "active",
+  "owner": "@odykyi",
+  "repo_health": {
+    "inherit": [
+      "CONTRIBUTING",
+      "SECURITY"
+    ]
+  },
+  "reasons": {
+    "north-star": "no measured metric yet"
   }
 }
