@@ -40,8 +40,13 @@ h1{font:800 clamp(34px,6vw,60px)/1.02 var(--serif);margin:48px 0 14px}h2{font:80
 pre{background:#0a0a0e;color:#e8e8e0;padding:14px;white-space:pre-wrap;overflow-wrap:anywhere;font:13px/1.5 var(--mono)}
 ol{padding-left:20px}li{margin:6px 0}code{font-family:var(--mono);font-size:13px}
 .note{color:var(--dim);font-size:13px;margin-top:28px}
+.getkey{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin:18px 0}.getkey span{color:var(--dim);font-size:14px}
+.btn-key{display:inline-block;background:var(--green);color:#04130a;font-weight:600;font-size:16px;padding:12px 22px;border:1px solid var(--ink);text-decoration:none}.btn-key:hover{background:#22c55e}
 @media (max-width:640px){.fam{grid-template-columns:1fr}.fam div{border-right:0;border-bottom:1px solid var(--ink)}}
 `;
+
+// Primary button: GitHub sign-in, then straight to the keys page. /auth/start ignores the utm params.
+export const FREE_KEY_HREF = '/auth/start?next=%2Fconsole%3Fsection%3Dkeys&utm_source=host&utm_medium=cta&utm_campaign=free-key';
 
 const DOCKERFILE = `FROM node:20-slim
 RUN apt-get update && apt-get install -y --no-install-recommends python3 git curl ca-certificates && rm -rf /var/lib/apt/lists/*
@@ -144,7 +149,8 @@ ${FONT_PRECONNECT}<link rel="stylesheet" href="https://fonts.googleapis.com/css2
 <style>${CSS}</style><script defer data-domain="host.flisk.si" src="https://flisk.sh/a.js"></script><script src="https://flisk.si/assets/bar.js" data-product="Host" data-icon="host" data-accent="#16a34a" data-text="Free places to run your own agent pods." defer></script></head><body><div class="frame">
 ${topbar({ name: 'Host', sw: SWITCH('host'), nav: SITE_NAV, cta: ['/console', 'Console'] })}<div class="pad">
 <h1>Run your AI agent for free.</h1>
-<p class="lede">An agent needs a computer that stays on. Here are the free ones we checked, and the catch for each. Nothing to sign up for here.</p>
+<p class="lede">Sign in to get a free key. It starts your AI agent on a free computer that stays on. Below, every free option we checked and its catch.</p>
+<p class="getkey"><a class="btn-key" href="${FREE_KEY_HREF}">Get a free API key</a><span>No card. Sign in with GitHub.</span></p>
 <div class="flow"><div>Your agent<small>the thing you built</small></div><i>→</i><div>A free machine<small>from the list below</small></div><i>→</i><div>Runs for you<small>mind the catch</small></div></div>
 <div class="links"><a href="#setup">Set it up in 4 steps →</a><a href="https://github.com/flisk-sh/fleet/tree/main/fleetd">fleetd on GitHub →</a><a href="https://fleet.flisk.si">Fleet →</a><a href="https://inference.flisk.si">Free AI models →</a></div>
 <div class="fam"><div><b>inference</b><span>free AI models</span></div><div><b>fleet</b><span>safe places for agents</span></div><div><b>host</b><span>free places to run them</span></div></div>
